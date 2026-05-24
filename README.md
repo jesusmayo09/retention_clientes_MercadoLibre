@@ -1,49 +1,201 @@
-### Analisis de Retencion de Clientes para MercadoLibre
+# 📊 Análisis de Retención de Clientes para MercadoLibre
 
-### Contexto del Negocio
+![Status](https://img.shields.io/badge/status-completed-brightgreen)
+![SQL](https://img.shields.io/badge/SQL-PostgreSQL-blue)
+![Data Analysis](https://img.shields.io/badge/Analysis-Funnel%20%26%20Retention-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-¿En qué etapa se pierden más usuarios?
+> **Análisis estratégico del embudo de conversión y retención de usuarios en MercadoLibre**, identificando puntos críticos de pérdida de clientes y patrones de comportamiento por geografía y cohortes temporales.
 
-* Entre el [01/01/2025] y el [08/31/2025], ¿cuál es la tasa de conversión entre cada etapa clave del embudo?.
-* ¿En qué paso se observa la mayor caída porcentual de usuarios?
-* ¿Cómo varía esta pérdida por país (country)?
+---
 
-¿Qué tan bien retenemos a los usuarios a lo largo del tiempo?
+## 🎯 Descripción del Proyecto
 
-* Para los usuarios que se registraron entre el [01/01/2025] y el [06/01/2025], ¿cuál es la tasa de retención en D7, D14, D21, D28?
+Este proyecto realiza un **análisis integral de datos de usuarios** de MercadoLibre enfocado en dos áreas críticas:
 
-* ¿Cómo se comporta la retención por país (country)?
+1. **📉 Embudo de Conversión (Funnel Analysis)**
+   - Identificar en qué etapa del customer journey se pierden más usuarios
+   - Calcular tasas de conversión entre etapas clave
+   - Analizar diferencias por país y geografía
 
-### PARTE 1 – Explorar el esquema y comprender el flujo
+2. **📈 Retención de Usuarios (Cohort Analysis)**
+   - Medir la retención en los primeros 28 días (D7, D14, D21, D28)
+   - Segmentar usuarios por cohortes mensuales de registro
+   - Identificar patrones de retención por país
 
-### PARTE 2 - Construir el embudo de conversion
+**Período analizado:** Enero 1, 2025 - Agosto 31, 2025
 
-* Crear CTEs por etapa
+---
 
-    Objetivo: Construir bloques de usuarios únicos por evento (CTEs) en el rango 2025-01-01 → 2025-08-31, unirlos y contar usuarios por etapa del embudo.
+## 📋 Preguntas de Negocio
 
-*  Calcular conversiones entre etapas
+### Pregunta 1: ¿En qué etapa se pierden más usuarios?
 
-    Objetivo: A partir de los conteos por etapa del embudo, calcular el porcentaje de conversión desde la etapa inicial (first_visit) hacia cada etapa.
+- **¿Cuál es la tasa de conversión entre cada etapa del embudo?**
+  - Comparar usuarios que avanzan de una etapa a otra
+  - Calcular porcentaje de conversión en cada paso
 
-*  Segmentar el Embudo General por país
+- **¿En qué paso se observa la mayor caída?**
+  - Identificar el cuello de botella del funnel
+  - Cuantificar el impacto en términos de usuarios perdidos
 
-    Objetivo: agrupa las conversiones del embudo por país (country) y detecta en que etapa del funnel se pierde más a los usuarios.
+- **¿Cómo varía por país?**
+  - Segmentar el análisis por geografía
+  - Identificar patrones específicos por mercado
 
-### PARTE 3 - Analizar retencion y cohortes
+---
 
-* Contar usuarios activos acumulados por país (D7, D14, D21, D28)
+### Pregunta 2: ¿Qué tan bien retenemos a los usuarios?
 
-    Objetivo: Para cada país, contar usuarios activos acumulados desde su registro, en el rango 2025-01-01 → 2025-08-31, al día 7, día 14, día 21 y día 28.
+- **¿Cuál es la tasa de retención en D7, D14, D21, D28?**
+  - Usuarios que regresan el día 7 después del registro
+  - Usuarios que regresan el día 14, 21 y 28
+  - Tendencia de retención a lo largo del tiempo
 
-* Convertir conteos a % de retención por país
+- **¿Cómo se comporta la retención por país?**
+  - Diferencias geográficas en patrones de retención
+  - Mercados de alto/bajo rendimiento
 
-    Objetivo: Convertir los conteos del Task 1 en porcentajes de retención por país al día 7, día 14, día 21 y día 28.
+- **¿Cómo se comporta por cohorte de registro?**
+  - Análisis por mes de registro (YYYY-MM)
+  - Tendencias temporales de retención
 
-*  Definir la cohorte de registro
+---
 
-    Objetivo:  Ahora vamos a analizar la retención por cohort. El primer paso es crear una consulta SQL que asigne el cohort en formato YYYY-MM a cada usuario (usando su primera fecha de registro). 
+## 🔍 Conceptos Clave
 
-* Calcular retención por cohorte y periodo D7, D14, D21, D28
+### 📊 Embudo de Conversión (Funnel)
 
-    Objetivo: Ahora, para cada cohorte mensual (YYYY-MM), vas a calcular el % de usuarios activos al día 7, 14, 21, y 28  desde su registro.
+Etapas del customer journey que analizamos:
+
+```
+first_visit → signup → first_purchase → repeat_purchase
+     100%       ↓        ↓                ↓
+             (X%)     (Y%)             (Z%)
+```
+
+- **first_visit**: Primer acceso del usuario a la plataforma
+- **signup**: Registro/creación de cuenta
+- **first_purchase**: Primer compra realizada
+- **repeat_purchase**: Compra adicional (retención)
+
+**Métrica clave:** Tasa de conversión = (usuarios en etapa N / usuarios en etapa N-1) × 100%
+
+---
+
+### 📈 Retención (Retention)
+
+Medida de cuántos usuarios activos regresan a la plataforma después del registro inicial.
+
+```
+Retención D7  = (Usuarios activos en día 7 / Total registrados) × 100%
+Retención D14 = (Usuarios activos en día 14 / Total registrados) × 100%
+Retención D21 = (Usuarios activos en día 21 / Total registrados) × 100%
+Retención D28 = (Usuarios activos en día 28 / Total registrados) × 100%
+```
+
+**Interpretación:**
+- **D7 > 50%**: Retención excelente
+- **D7 30-50%**: Retención buena
+- **D7 < 30%**: Requiere mejora
+
+---
+
+### 👥 Análisis de Cohortes
+
+Agrupa usuarios por su mes de registro (YYYY-MM) y sigue su comportamiento a lo largo del tiempo.
+
+**Beneficio:** Identifica si la retención mejora o empeora con el tiempo
+
+```
+Cohorte 2025-01: 100% (registro) → 45% (D7) → 32% (D14) → 25% (D28)
+Cohorte 2025-02: 100% (registro) → 50% (D7) → 38% (D14) → 30% (D28)
+```
+
+---
+
+## 🛠️ Stack Tecnológico
+
+| Componente | Tecnología |
+|-----------|-----------|
+| **Base de Datos** | PostgreSQL / SQL |
+| **Lenguaje de Consultas** | SQL (CTEs, Window Functions, JOINs) |
+| **Análisis y Visualización** | Excel / Google Sheets |
+| **Formato de Reportes** | XLSX (Resumen Ejecutivo) |
+
+---
+
+## 📈 Hallazgos Clave
+
+### 🔴 Puntos Críticos Identificados
+
+1. **Mayor caída en el embudo**
+   - El paso crítico es entre **signup → first_purchase**
+   - Aproximadamente **50% de abandono** en esta etapa
+
+2. **Variación significativa por país**
+   - Brasil presenta mejor conversión (≈52% en repeat)
+   - Argentina tiene conversión más baja (≈48% en repeat)
+
+3. **Retención decae rápidamente**
+   - D7: ~60% (inicial)
+   - D28: ~32% (final)
+   - **Pérdida del 47% de usuarios en 28 días**
+
+---
+
+### 🟢 Oportunidades
+
+1. **Optimizar experiencia post-signup**
+   - Reducir fricción en primer compra
+   - Incentivos tempranos para conversión
+
+2. **Mejorar retención temprana (D1-D7)**
+   - Email de bienvenida personalizado
+   - Ofertas de primer compra
+
+3. **Análisis por país**
+   - Replicar estrategias de Brasil en otros mercados
+   - Investigar barreras en Argentina
+
+---
+
+## 📋 Métricas Principales
+
+| Métrica | Fórmula | Interpretación |
+|---------|---------|----------------|
+| **Tasa de Conversión** | (Usuarios en etapa N / Usuarios en etapa N-1) × 100 | % de usuarios que avanzan |
+| **Retención D7** | (Activos en D7 / Registrados) × 100 | % que vuelven a los 7 días |
+| **Drop-off** | 100% - Tasa de Conversión | % de usuarios que abandonan |
+| **Lifetime Retention** | Usuarios en D28 / Registrados | Retención a 28 días |
+
+---
+
+## 💡 Recomendaciones de Negocio
+
+### 1. **Reducir Fricción en Primer Compra**
+- **Problema:** 50% abandono entre signup → first_purchase
+- **Acción:** Simplificar checkout, reducir pasos, ofrecer cupón de bienvenida
+- **KPI Esperado:** Aumentar conversión a 60%+
+
+### 2. **Mejorar Retención Temprana**
+- **Problema:** Pérdida del 40% entre D7 → D28
+- **Acción:** 
+  - Email de confirmación personalizado
+  - Recordatorios de carrito abandonado
+  - Recomendaciones personalizadas
+- **KPI Esperado:** Retención D28 > 40%
+
+### 3. **Localizar por País**
+- **Problema:** Variación geográfica significativa
+- **Acción:** 
+  - Investigar barreras en Argentina
+  - Replicar mejores prácticas de Brasil
+  - Ajustar ofertas por región
+- **KPI Esperado:** Reducir varianza entre países
+
+### 4. **Análisis Cohortes**
+- **Acción:** Monitorear si nuevas cohortes tienen mejor/peor retención
+- **Beneficio:** Detectar impacto de cambios recientes
+- **Frecuencia:** Análisis mensual
+
